@@ -138,7 +138,7 @@ struct ChatCoachView: View {
             } label: {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(inputText.trimmed.isEmpty ? .secondary : .accentColor)
+                    .foregroundStyle(inputText.trimmed.isEmpty ? Color.secondary : Color.accentColor)
             }
             .disabled(inputText.trimmed.isEmpty)
             .accessibilityLabel("Send message")

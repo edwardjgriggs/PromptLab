@@ -26,7 +26,7 @@ struct CopyButton: View {
                 Text(showCopied ? "Copied!" : label)
             }
             .font(.subheadline.weight(.medium))
-            .foregroundStyle(showCopied ? .green : .accentColor)
+            .foregroundStyle(showCopied ? Color.green : Color.accentColor)
         }
         .animation(.easeInOut(duration: 0.2), value: showCopied)
         .accessibilityLabel(showCopied ? "Copied to clipboard" : "Copy \(label)")

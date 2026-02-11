@@ -77,45 +77,59 @@ struct GeneratorWizardView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(PromptCategory.allCases) { category in
-                    Button {
-                        answers.category = category
-                    } label: {
-                        VStack(spacing: 8) {
-                            Image(systemName: category.icon)
-                                .font(.title2)
-                            Text(category.rawValue)
-                                .font(.subheadline.weight(.medium))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(answers.category == category ? Color.accentColor.opacity(0.15) : Color(.systemGray6))
-                        .foregroundStyle(answers.category == category ? .accentColor : .primary)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(answers.category == category ? Color.accentColor : .clear, lineWidth: 2)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
+            categoryGrid
 
             if !answers.category.subcategories.isEmpty {
-                Text("Subcategory")
-                    .font(.headline)
-                    .padding(.top, 8)
+                subcategoryPicker
+            }
+        }
+    }
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(answers.category.subcategories, id: \.self) { sub in
-                            TagChip(
-                                text: sub,
-                                isSelected: answers.subcategory == sub
-                            ) {
-                                answers.subcategory = answers.subcategory == sub ? "" : sub
-                            }
+    private var categoryGrid: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            ForEach(PromptCategory.allCases) { category in
+                categoryButton(for: category)
+            }
+        }
+    }
+
+    private func categoryButton(for category: PromptCategory) -> some View {
+        let isSelected = answers.category == category
+        return Button {
+            answers.category = category
+        } label: {
+            VStack(spacing: 8) {
+                Image(systemName: category.icon)
+                    .font(.title2)
+                Text(category.rawValue)
+                    .font(.subheadline.weight(.medium))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(isSelected ? Color.accentColor.opacity(0.15) : Color(.systemGray6))
+            .foregroundStyle(isSelected ? Color.accentColor : Color.primary)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var subcategoryPicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Subcategory")
+                .font(.headline)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(answers.category.subcategories, id: \.self) { sub in
+                        TagChip(
+                            text: sub,
+                            isSelected: answers.subcategory == sub
+                        ) {
+                            answers.subcategory = answers.subcategory == sub ? "" : sub
                         }
                     }
                 }
