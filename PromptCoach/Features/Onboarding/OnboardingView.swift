@@ -16,13 +16,16 @@ struct OnboardingView: View {
             StepProgressBar(totalSteps: totalPages, currentStep: currentPage)
                 .padding(.top)
 
-            TabView(selection: $currentPage) {
-                welcomePage.tag(0)
-                categoriesPage.tag(1)
-                verbosityPage.tag(2)
-                modelPage.tag(3)
+            Group {
+                switch currentPage {
+                case 0: welcomePage
+                case 1: categoriesPage
+                case 2: verbosityPage
+                case 3: modelPage
+                default: EmptyView()
+                }
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .animation(.easeInOut, value: currentPage)
 
             bottomBar
@@ -56,43 +59,54 @@ struct OnboardingView: View {
     }
 
     private var categoriesPage: some View {
-        VStack(spacing: 20) {
-            Spacer()
-            Text("What will you use AI for?")
-                .font(.title2.bold())
-                .multilineTextAlignment(.center)
+        ScrollView {
+            VStack(spacing: 20) {
+                Spacer(minLength: 40)
+                Text("What will you use AI for?")
+                    .font(.title2.bold())
+                    .multilineTextAlignment(.center)
 
-            Text("Select all that apply. This helps us personalize your experience.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+                Text("Select all that apply. This helps us personalize your experience.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
 
-            let categories = ["Writing", "Work email", "School", "Coding help", "Brainstorming", "Other"]
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(categories, id: \.self) { category in
-                    Button {
-                        if selectedCategories.contains(category) {
-                            selectedCategories.remove(category)
-                        } else {
-                            selectedCategories.insert(category)
-                        }
-                    } label: {
-                        Text(category)
-                            .font(.subheadline.weight(.medium))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(selectedCategories.contains(category) ? Color.accentColor : Color(.systemGray5))
-                            .foregroundStyle(selectedCategories.contains(category) ? .white : .primary)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    }
-                    .accessibilityAddTraits(selectedCategories.contains(category) ? .isSelected : [])
-                }
+                categoriesGrid
+                    .padding(.horizontal)
+
+                Spacer(minLength: 40)
             }
-            .padding(.horizontal)
-
-            Spacer()
+            .padding()
         }
-        .padding()
+    }
+
+    private var categoriesGrid: some View {
+        let categories = ["Writing", "Work email", "School", "Coding help", "Brainstorming", "Other"]
+        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            ForEach(categories, id: \.self) { category in
+                categoryChip(category)
+            }
+        }
+    }
+
+    private func categoryChip(_ category: String) -> some View {
+        let isSelected = selectedCategories.contains(category)
+        return Button {
+            if isSelected {
+                selectedCategories.remove(category)
+            } else {
+                selectedCategories.insert(category)
+            }
+        } label: {
+            Text(category)
+                .font(.subheadline.weight(.medium))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(isSelected ? Color.accentColor : Color(.systemGray5))
+                .foregroundStyle(isSelected ? Color.white : Color.primary)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private var verbosityPage: some View {
